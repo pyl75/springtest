@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+                        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+                        http://www.springframework.org/schema/tx  http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+        <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+            <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+            <property name="url" value="jdbc:mysql://47.94.102.25:3306/test?characterEncoding=UTF-8"></property>
+            <property name="username" value="root"></property>
+            <property name="password" value="1q2w3e4r%T001"></property>
+            <!--连接池启动时的初始值-->
+            <property name="initialSize" value="1"></property>
+            <!--连接池的最大值-->
+            <property name="maxActive" value="300"></property>
+            <!--最大空闲值，当经过一个高峰时间后，连接池可以慢慢的将已经用不到的连接慢慢的释放一部分，一直减少到maxIdle为止-->
+            <property name="maxIdle" value="2"/>
+            <!--最小空闲值,当空闲的连接数减到小于阈值时，连接池就会去预申请一些连接，以免洪峰来时来不及申请-->
+            <property name="minIdle" value="1"/>
+        </bean>
+
+        <!--配置业务bean：PersonServiceBean-->
+        <bean id="userService" class="com.excelib.service.Impl.UserServiceImpl">
+            <!--向属性dataSource中注入数据源-->
+            <property name="dataSource" ref="dataSource"></property>
+        </bean>
+        <!--配置事务相关-->
+        <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+            <property name="dataSource" ref="dataSource"/>
+        </bean>
+        <tx:annotation-driven transaction-manager="transactionManager"></tx:annotation-driven>
+</beans>

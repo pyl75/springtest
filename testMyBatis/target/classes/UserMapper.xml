@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.excelib.dao.UserMapper">
+    <resultMap id="userMap" type="com.excelib.User">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="age" property="age"/>
+        <result column="sex" property="sex"/>
+    </resultMap>
+    <!--这里的namespace必须式UserMapper接口的路径，不然运行的时候要报错 “is not known to the MapperRegistry”-->
+    <insert id="insertUser" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+        <selectKey keyProperty="id" resultType="int" order="BEFORE">
+            select if(max(id) is null ,1,max(id)+2) as newId from user
+        </selectKey>
+        insert into user(name,age)values (#{name},#{age})
+        <!--这里的sql不能加分号，否则报“ORA-00911”的错误-->
+    </insert>
+    <select id="getUser" resultMap="userMap" parameterType="integer">
+        select * from user where id = ${id}
+    </select>
+
+    <select id="getUserByCondition" resultMap="userMap" parameterType="map">
+        select * from user
+        <where>
+            <if test="user.name!=null and user.name !=''">
+                and name =  #{user.name}
+            </if>
+            <if test="user.age!=null and user.age !=''">
+                and  age = #{user.age}
+            </if>
+            <if test="user.id!=null and user.id !=''">
+                and  id = #{user.id}
+            </if>
+        </where>
+    </select>
+
+    <select id="deleteUser"  parameterType="integer">
+        delete from user where id = #{id}
+    </select>
+
+    <update id="updateUser" parameterType="com.excelib.User">
+        update user
+        <set>
+            <if test="name!=null and name !=''">
+                name = #{name},
+            </if>
+            <if test="age!=null and age !=''">
+                age = ${age}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

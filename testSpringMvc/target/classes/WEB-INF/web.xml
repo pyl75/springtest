@@ -1,0 +1,28 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app id="WebApp_id"   >
+  <display-name>SpringMvc</display-name>
+  <!--如果配置在这里spring不会自动填充配置信息-->
+  <!--使用ContextLoaderListener配置时，需要告诉Spring的配置文件位置-->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:applicationContext.xml</param-value>
+  </context-param>
+  <!--SpringMvc前端控制器-->
+  <servlet>
+    <servlet-name>SpringMvc</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <!--自动填充配置信息到frameworkServlet中-->
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:applicationContext.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SpringMvc</servlet-name>
+    <url-pattern>*.htm</url-pattern>
+  </servlet-mapping>
+</web-app>

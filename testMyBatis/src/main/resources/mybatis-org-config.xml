@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!--单独使用mybatis 的配置文件-->
+<configuration>
+    <!--读取外部配置文件-->
+    <properties resource="jdbc.properties"/>
+    <settings>
+        <!--changes from the defaults for testing-->
+        <setting name="cacheEnabled" value="false"/>
+        <setting name="useGeneratedKeys" value="true"></setting>
+        <setting name="defaultExecutorType" value="REUSE"></setting>
+        <!--驼峰转换-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+    <typeAliases>
+        <typeAlias alias="User" type="com.excelib.User"></typeAlias>
+        <!--定义别名扫描 @Alias注解-->
+        <package name="com.excelib"/>
+    </typeAliases>
+    <plugins>
+        <plugin interceptor="com.excelib.plugin.MyPlugin">
+            <property name="dbType" value="mysql"/>
+        </plugin>
+    </plugins>
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="jdbc">
+                <property name="autoCommit" value="false"/>
+            </transactionManager>
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"></property>
+                <property name="url" value="${url}"></property>
+                <property name="username" value="${username}"></property>
+                <property name="password" value="${password}"></property>
+            </dataSource>
+        </environment>
+    </environments>
+    <!--指定数据库类型-->
+    <databaseIdProvider type="com.excelib.CustomDatabaseIdProvider">
+        <property name="SQL Server" value="sqlserver"/>
+        <property name="MySQL" value="mysql"/>
+        <property name="DB2" value="db2"/>
+        <property name="Oracle" value="oracle"/>
+    </databaseIdProvider>
+    <mappers>
+        <mapper resource="UserMapper.xml"></mapper>
+    </mappers>
+
+</configuration>

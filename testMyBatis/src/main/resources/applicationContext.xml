@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+                        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd  ">
+
+        <bean id="propertyConfigurer"
+              class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+            <property name="location">
+                <value>classpath:jdbc.properties</value>
+            </property>
+        </bean>
+
+        <bean id="mysql" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+            <property name="driverClassName" value="${driver}"></property>
+            <property name="url" value="${url}"></property>
+            <property name="username" value="${username}"></property>
+            <property name="password" value="${password}"></property>
+            <!--连接池启动时的初始值-->
+            <property name="initialSize" value="1"></property>
+            <!--连接池的最大值-->
+            <property name="maxActive" value="300"></property>
+            <!--最大空闲值，当经过一个高峰时间后，连接池可以慢慢的将已经用不到的连接慢慢的释放一部分，一直减少到maxIdle为止-->
+            <property name="maxIdle" value="2"/>
+            <!--最小空闲值,当空闲的连接数减到小于阈值时，连接池就会去预申请一些连接，以免洪峰来时来不及申请-->
+            <property name="minIdle" value="1"/>
+            <property name="maxWait" value="500"/>
+            <property name="defaultAutoCommit" value="true"/>
+        </bean>
+
+        <!--配置MyBatis多数据库厂商的支持-->
+        <!--<bean id="vendorProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+            <property name="properties">
+                <props>
+                    <prop key="SQL Server">sqlserver</prop>
+                    <prop key="MySQL">mysql</prop>
+                    <prop key="DB2">db2</prop>
+                    <prop key="Oracle">oracle</prop>
+                    <prop key="dbType">${dbType}</prop>
+                </props>
+            </property>
+        </bean>-->
+        <!--<bean id="customDatabaseIdProvider" class="com.excelib.CustomDatabaseIdProvider">
+            <property name="properties" ref="vendorProperties"/>
+        </bean>-->
+
+        <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+            <property name="dataSource" ref="${dbType}"/>
+            <!--Mapper的配置方式有两种一种是在Mybatis的全局配置文件中，一种是直接配置扫描-->
+            <!--<property name="mapperLocations" value="classpath:UserMapper.xml"/>-->
+            <property name="configLocation" value="classpath:mybatis-spring-config.xml"/>
+
+            <!-- <property name="databaseIdProvider" ref="customDatabaseIdProvider"/>-->
+            <property name="plugins">
+                <array>
+                    <bean class="com.excelib.plugin.MyPlugin"/>
+                    <bean class="com.excelib.plugin.PagingPlugin">
+                        <!--默认页码-->
+                        <property name="defaultPage" value="0"/>
+                        <!--默认开启页数的校验当当请求页数超过总页数抛出异常-->
+                        <property name="defaultCheckFlag" value="true"/>
+                        <!--默认每页数量-->
+                        <property name="defaultPageSize" value="10"/>
+                        <!--默认是否启用插件-->
+                        <property name="defaultUseFlag" value="true"/>
+                    </bean>
+                </array>
+            </property>
+        </bean>
+
+        <!--单个映射器-->
+        <!--<bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+            <property name="mapperInterface" value="com.excelib.dao.UserMapper"></property>
+            <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+        </bean>-->
+        <!--扫描映射器-->
+        <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+            <property name="basePackage" value="com.excelib.dao"></property>
+        </bean>
+</beans>
